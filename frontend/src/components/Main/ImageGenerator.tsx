@@ -1,34 +1,31 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload } from 'lucide-react';
-import { generateImage, generateCaption } from './api';
+import { generateImage } from './api';
 
-interface ImageGenerationProps {
-  selectedFile: File | null;
-  preview: string | null;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-export const ImageGeneration: React.FC<ImageGenerationProps> = ({ selectedFile, preview, onFileChange }) => {
+export const ImageGeneration: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [caption, setCaption] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleGenerateImage = async () => {
-    if (selectedFile && prompt) {
-      setIsLoading(true);
-      try {
-        const captionResponse = await generateCaption(selectedFile);
-        setCaption(captionResponse.caption);
+    if (!prompt.trim() || !imageFile) return;
 
-        const imageResponse = await generateImage(selectedFile, prompt, 0.8, 50, 7.5);
-        setGeneratedImage(imageResponse.generated_image_url);
-      } catch (error) {
-        console.error('Error generating image:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    setIsLoading(true);
+    try {
+      const response = await generateImage(imageFile, prompt, 0.8, 50, 7.5);
+      setGeneratedImage(response.generated_image_url);
+    } catch (error) {
+      console.error('Error generating image:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      setImageFile(file);
     }
   };
 
@@ -42,19 +39,11 @@ export const ImageGeneration: React.FC<ImageGenerationProps> = ({ selectedFile, 
         className="relative"
       >
         <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
-          {preview ? (
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <img
-              src="https://images.unsplash.com/photo-1737995720044-8d9bd388ff4f?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Default"
-              className="w-full h-full object-cover opacity-90"
-            />
-          )}
+          <img
+            src={generatedImage || "https://images.unsplash.com/photo-1737995720044-8d9bd388ff4f?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+            alt="Generated or Default"
+            className="w-full h-full object-cover"
+          />
         </div>
       </motion.div>
 
@@ -70,25 +59,18 @@ export const ImageGeneration: React.FC<ImageGenerationProps> = ({ selectedFile, 
             AI-Powered Image Generation
           </h3>
           <p className="text-lg text-gray-600 leading-relaxed">
-            Transform your images using text prompts with our advanced AI models.
+            Transform your ideas into stunning AI-generated images using text prompts.
           </p>
         </div>
 
         <div className="space-y-6">
-          <label className="block">
-            <motion.div
-              className="group flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-3 rounded-xl cursor-pointer hover:bg-gray-800"
-            >
-              <Upload className="w-5 h-5 " />
-              <span className="font-medium">Upload Image</span>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={onFileChange}
-              />
-            </motion.div>
-          </label>
+          {/* Image Upload */}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full p-3 rounded-lg border border-gray-200 outline-none"
+          />
 
           <textarea
             value={prompt}
@@ -98,35 +80,14 @@ export const ImageGeneration: React.FC<ImageGenerationProps> = ({ selectedFile, 
             rows={3}
           />
 
-          {selectedFile && (
-            <motion.button
-              whileHover={{ scale: 1 }}
-              whileTap={{ scale: 0 }}
-              onClick={handleGenerateImage}
-              disabled={isLoading}
-              className="w-full bg-gray-900 text-white px-8 py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors"
-            >
-              {isLoading ? 'Generating...' : 'Generate Image'}
-            </motion.button>
-          )}
-
-          {caption && (
-            <div className="mt-6">
-              <h4 className="font-semibold text-gray-900 mb-2">Generated Caption:</h4>
-              <p className="text-gray-600">{caption}</p>
-            </div>
-          )}
-
-          {generatedImage && (
-            <div className="mt-6">
-              <h4 className="font-semibold text-gray-900 mb-2">Generated Image:</h4>
-              <img
-                src={generatedImage}
-                alt="Generated"
-                className="w-full rounded-lg"
-              />
-            </div>
-          )}
+          <motion.button
+           
+            onClick={handleGenerateImage}
+            disabled={isLoading || !imageFile}
+            className="w-full bg-gray-900 text-white px-8 py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors"
+          >
+            {isLoading ? 'Generating...' : 'Generate Image'}
+          </motion.button>
         </div>
       </motion.div>
     </div>

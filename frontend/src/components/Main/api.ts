@@ -2,7 +2,7 @@ const API_URL = 'http://localhost:8000';
 
 export const generateCaption = async (file: File) => {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", file);  // Ensure this key matches the backend expectation
 
   const response = await fetch(`${API_URL}/upload/`, {
     method: "POST",
@@ -23,13 +23,13 @@ export const generateImage = async (
   guidanceScale: number
 ) => {
   const formData = new FormData();
-  formData.append("image", image);
+  formData.append("file", image);  // Use "file" as the key to match backend expectation
   formData.append("prompt", prompt);
   formData.append("strength", strength.toString());
   formData.append("steps", steps.toString());
   formData.append("guidance_scale", guidanceScale.toString());
 
-  const response = await fetch(`${API_URL}/api/generate/`, {
+  const response = await fetch(`${API_URL}/generate/`, {
     method: "POST",
     body: formData,
   });
