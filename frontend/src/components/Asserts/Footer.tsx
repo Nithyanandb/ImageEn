@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
           <div>
             <h3 className="text-xl font-serif text-gray-900 mb-4 flex items-center gap-2">
               <Wand2 className="w-6 h-6" />
-              EnhanceAI
+              Aura Flow
             </h3>
             <p className="text-gray-600">
               Transform your media with cutting-edge AI technology.

@@ -142,8 +142,8 @@ export const Showcase: React.FC = () => {
           className="mt-20 text-center"
         >
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1 }}
+            whileTap={{ scale: 0 }}
             className="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-colors"
           >
             <span className="font-medium">Start Enhancing Your Media</span>
